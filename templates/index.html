@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Búsqueda Tabú RCC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Fondo animado */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #3a1c71, #d76d77, #ffaf7b, #43cea2);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+        }
+
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        .contenedor {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 50px auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px;
+            width: 100%;
+            background-color: #00c9a7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #00b89c;
+        }
+
+        #result-container {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            text-align: center;
+            display: none;
+        }
+
+        .leyenda {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+            color: #ddd;
+        }
+
+        h2, h3 {
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="leyenda">Raul Ciriaco Castillo - Método o Algoritmo Tabú</div>
+
+    <h1>Optimización de Ruta con Búsqueda Tabú</h1>
+
+    <div class="contenedor">
+        <form id="rutaForm">
+            <label for="origin_city">Ciudad Origen:</label>
+            <select name="origin_city" required>
+                {% for city in cities %}
+                    <option value="{{ city }}">{{ city }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="destination_city">Ciudad Destino:</label>
+            <select name="destination_city" required>
+                {% for city in cities %}
+                    <option value="{{ city }}">{{ city }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Calcular Ruta</button>
+        </form>
+    </div>
+
+    <div id="result-container">
+        <h2>Ruta óptima:</h2>
+        <p id="ruta"></p>
+        <h3>Distancia Total:</h3>
+        <p id="distancia"></p>
+    </div>
+
+    <script>
+        document.querySelector("#rutaForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            fetch("/solve", {
+                method: "POST",
+                body: new FormData(event.target)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result-container").style.display = "block";
+                document.getElementById("ruta").innerText = data.ruta.join(" → ");
+                document.getElementById("distancia").innerText = `${data.distancia_total.toFixed(2)} km`;
+            })
+            .catch(error => console.error("Error en la solicitud:", error));
+        });
+    </script>
+
+</body>
+</html>
